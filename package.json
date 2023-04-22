@@ -1,5 +1,5 @@
 {
-  "name": "castless",
+  "name": "@thaunknown/castless",
   "version": "0.0.1",
   "description": "Cast custom ChromeCast Apps without paying for the developer console.",
   "type": "module",
