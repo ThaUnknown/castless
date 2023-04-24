@@ -23,6 +23,14 @@ export default class Castless extends EventTarget {
     })
   }
 
+  start () {
+    this.presentationRequest?.start()
+  }
+
+  end () {
+    this.destroy()
+  }
+
   handleAvailability ({ value }) {
     if (this.destoyed) return
     this.canCast = !!value
@@ -31,7 +39,6 @@ export default class Castless extends EventTarget {
 
   initConnection ({ connection }) {
     if (this.destoyed) return
-    // these quality settings are likely to make cast overheat, oh noes!
     this.p2pConnection = new Peer({
       polite: true,
       quality: this.qualityOptions
@@ -52,8 +59,13 @@ export default class Castless extends EventTarget {
     })
 
     this.p2pConnection.dc.onopen = () => {
-      if (this.presentationConnection) {
-        this.dispatchEvent(new CustomEvent('connected', { detail: this.p2pConnection.dc }))
+      if (!this.destoyed) {
+        this.dispatchEvent(new CustomEvent('connected', {
+          detail: {
+            peerConnection: this.p2pConnection.pc,
+            dataChannel: this.p2pConnection.dc
+          }
+        }))
       }
     }
   }

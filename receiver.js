@@ -17,7 +17,12 @@ export default class Receiver extends EventTarget {
     const peer = new Peer(defaultQualityOptions)
 
     peer.dc.onopen = () => {
-      this.dispatchEvent(new CustomEvent('connected', { detail: peer.dc }))
+      this.dispatchEvent(new CustomEvent('connected', {
+        detail: {
+          peerConnection: peer.pc,
+          dataChannel: peer.dc
+        }
+      }))
     }
 
     // only used to signal description and candidates to the other peer

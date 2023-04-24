@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+  <script type="module">
+    try {
+      const { Receiver } = await import('./index.js')
+
+      const rec = new Receiver()
+      rec.onconnected = ({ detail }) => {
+        detail.dataChannel.onmessage = ({ data }) => {
+          document.body.append(data)
+        }
+      }
+    } catch (e) {
+      document.body.append(e)
+    }
+  </script>
+    <style>
+      body {
+        margin: 0;
+        background: #444;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        color: white
+      }
+    </style>
+    </head>
+</head>
+<body>
+  test!
+</body>
+<script>
+  document.body.append('xd')
+</script>
+</html>
