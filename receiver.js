@@ -14,25 +14,25 @@ export default class Receiver extends EventTarget {
   }
 
   addConnection (connection) {
-    const peer = new Peer(defaultQualityOptions)
+    this.peer = new Peer(defaultQualityOptions)
 
-    peer.addEventListener('ready', () => {
+    this.peer.addEventListener('ready', () => {
       this.dispatchEvent(new CustomEvent('connected', {
         detail: {
-          peerConnection: peer,
-          dataChannel: peer.dataChannel
+          peerConnection: this.peer,
+          dataChannel: this.peer.dataChannel
         }
       }))
     })
 
     // only used to signal description and candidates to the other peer
     // once a connection is establish the DataChannel takes over.
-    peer.addEventListener('signal', ({ detail }) => {
+    this.peer.addEventListener('signal', ({ detail }) => {
       connection.send(detail)
     })
 
     connection.addEventListener('message', ({ data }) => {
-      peer.signal(data)
+      this.peer.signal(data)
     })
   }
 
