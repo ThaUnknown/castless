@@ -16,23 +16,27 @@ export default class Receiver extends EventTarget {
   addConnection (connection) {
     const peer = new Peer(defaultQualityOptions)
 
-    peer.dc.onopen = () => {
+    peer.addEventListener('ready', () => {
       this.dispatchEvent(new CustomEvent('connected', {
         detail: {
-          peerConnection: peer.pc,
-          dataChannel: peer.dc
+          peerConnection: peer,
+          dataChannel: peer.dataChannel
         }
       }))
-    }
+    })
 
     // only used to signal description and candidates to the other peer
     // once a connection is establish the DataChannel takes over.
-    peer.signalingPort.onmessage = ({ data }) => {
-      connection.send(data)
-    }
+    peer.addEventListener('signal', ({ detail }) => {
+      connection.send(detail)
+    })
 
     connection.addEventListener('message', ({ data }) => {
-      peer.signalingPort.postMessage(data)
+      peer.signal(data)
     })
+  }
+
+  destroy () {
+    this.peer?.destroy()
   }
 }

@@ -1,4 +1,4 @@
-export { default as Peer } from './PolitePeer.js'
+export { default as Peer } from './TinyPeer.js'
 
 export const defaultQualityOptions = {
   audio: {

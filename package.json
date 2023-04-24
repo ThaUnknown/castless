@@ -4,9 +4,6 @@
   "description": "Cast custom ChromeCast Apps without paying for the developer console.",
   "type": "module",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "cast",
     "chromecast",

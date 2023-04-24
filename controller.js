@@ -4,7 +4,7 @@ export default class Castless extends EventTarget {
   destoyed = null
   presentationConnection = null
   presentationRequest = null
-  p2pConnection = null
+  peer = null
   qualityOptions = null
 
   constructor (receiverURL, qualityOptions = defaultQualityOptions) {
@@ -15,7 +15,9 @@ export default class Castless extends EventTarget {
 
     this.presentationRequest = new PresentationRequest([receiverURL])
     navigator.presentation.defaultRequest = this.presentationRequest
-    this.presentationRequest.addEventListener('connectionavailable', e => this.initConnection(e))
+    this.presentationRequest.addEventListener('connectionavailable', ({ connection }) => {
+      connection.addEventListener('connect', () => this.initConnection(connection))
+    })
     this.presentationRequest.getAvailability().then(aval => {
       if (this.destoyed) return
       aval.onchange = ({ target }) => this.handleAvailability(target)
@@ -37,37 +39,36 @@ export default class Castless extends EventTarget {
     this.dispatchEvent(new CustomEvent('availabilitychange', { detail: !!value }))
   }
 
-  initConnection ({ connection }) {
+  initConnection (connection) {
     if (this.destoyed) return
-    this.p2pConnection = new Peer({
-      polite: true,
+    this.peer = new Peer({
       quality: this.qualityOptions
     })
 
     this.presentationConnection = connection
     this.presentationConnection.addEventListener('terminate', () => {
       this.presentationConnection = null
-      this.p2pConnection = null
+      this.peer = null
     })
 
-    this.p2pConnection.signalingPort.onmessage = ({ data }) => {
-      this.presentationConnection.send(data)
-    }
+    this.peer.addEventListener('signal', ({ detail }) => {
+      this.presentationConnection.send(detail)
+    })
 
     this.presentationConnection.addEventListener('message', ({ data }) => {
-      this.p2pConnection.signalingPort.postMessage(data)
+      this.peer.signal(data)
     })
 
-    this.p2pConnection.dc.onopen = () => {
+    this.peer.addEventListener('ready', () => {
       if (!this.destoyed) {
         this.dispatchEvent(new CustomEvent('connected', {
           detail: {
-            peerConnection: this.p2pConnection.pc,
-            dataChannel: this.p2pConnection.dc
+            peerConnection: this.peer,
+            dataChannel: this.peer.dataChannel
           }
         }))
       }
-    }
+    })
   }
 
   destroy () {
@@ -75,6 +76,6 @@ export default class Castless extends EventTarget {
     navigator.presentation.defaultRequest = null
     this.presentationRequest?.terminate()
     this.presentationConnection?.terminate()
-    this.p2pConnection?.pc.close()
+    this.peer?.destroy()
   }
 }

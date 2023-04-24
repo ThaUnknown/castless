@@ -12,6 +12,7 @@
 
       const rec = new Receiver()
       rec.addEventListener('connected', ({ detail }) => {
+        document.body.append('\nconnected!\n')
         detail.dataChannel.onmessage = ({ data }) => {
           document.body.append(data)
         }
@@ -33,9 +34,8 @@
     </head>
 </head>
 <body>
-  test!
+  loaded!
 </body>
 <script>
-  document.body.append('xd')
 </script>
 </html>
