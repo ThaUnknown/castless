@@ -11,11 +11,11 @@
       const { Receiver } = await import('./index.js')
 
       const rec = new Receiver()
-      rec.onconnected = ({ detail }) => {
+      rec.addEventListener('connected', ({ detail }) => {
         detail.dataChannel.onmessage = ({ data }) => {
           document.body.append(data)
         }
-      }
+      })
     } catch (e) {
       document.body.append(e)
     }

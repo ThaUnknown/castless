@@ -9,7 +9,7 @@
   <script type="module">
     import CastLess from './index.js'
 
-    const cst = new CastLess('./rec.html')
+    const cst = new CastLess('https://thaunknown.github.io/castless/rec.html')
     start.onclick = () => {
       if (cst.canCast) {
         cst.start()
@@ -19,16 +19,18 @@
         }
       }
     }
-    cst.onconnect = ({ detail }) => {
+    cst.addEventListener('connected', ({ detail }) => {
+      console.log('connected')
       send.onclick = () => {
+        console.log('sending', text.value)
         detail.dataChannel.send(text.value)
       }
-    }
+    })
   </script>
 </head>
 <body>
   <button id="start">Start</button>
-  <input type="text">
+  <input type="text" id="text">
   <button id="send">Send</button>
 </body>
 </html>
